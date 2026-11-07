@@ -1,1 +1,1 @@
-export const $ = (id) => document.getElementById(id);
+window.StarCatch = { $: (id) => document.getElementById(id) };

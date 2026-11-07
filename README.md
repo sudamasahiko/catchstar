@@ -4,8 +4,9 @@
 
 ## 開発
 
-リポジトリのルートで次を実行し、HTTP サーバー経由でアクセスしてください。
-ES Modules を使用しているため、`index.html` の直接オープン（`file://`）はサポートしません。
+`index.html` をブラウザーで開くか、リポジトリのルートで次を実行して HTTP サーバー経由でアクセスしてください。
+JavaScript は通常のスクリプトとして依存順に読み込むため、ES Modules の CORS 制限を受けません。
+各ファイルは関数スコープに閉じ、共有する機能だけを `window.StarCatch` に公開しています。
 
 ```sh
 python3 -m http.server 8000 --bind 127.0.0.1
@@ -32,8 +33,11 @@ Node.js、Playwright、Chromium を用意し、上記サーバーを起動して
 
 ```sh
 node tests/smoke.cjs
+node tests/local-loading.cjs
 ```
 
 `CHROMIUM_PATH` で Chromium の実行ファイル、`TEST_URL` で検証する HTTP URL を指定できます。
 テストは独立したブラウザーで EASY/HARD 各20秒のプレイ、一時停止と再開、ランキングの永続化、
 JSON 出力、モバイル幅での表示を確認します。音声の実際の聞こえ方は手動で確認してください。
+
+`local-loading.cjs` は不透明なオリジンで開始・一時停止・再開を検証し、モジュールの CORS 制約が出る条件での退行を防ぎます。
