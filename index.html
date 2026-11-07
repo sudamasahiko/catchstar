@@ -1,59 +1,104 @@
 <!doctype html>
 <html lang="ja">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>ほしぞらキャッチ ― 20秒チャレンジ</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#10162e;color:#fff5df;font-family:'Yu Gothic','Meiryo',sans-serif;min-height:100svh;display:grid;place-items:center;padding:20px}main{width:min(960px,100%)}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.eyebrow{color:#ffcf79;font-size:11px;letter-spacing:.25em}h1{font-size:clamp(22px,4vw,34px);margin:5px 0}button{font:inherit;cursor:pointer;border:0;border-radius:14px;background:#ffd17d;color:#30233c;font-weight:bold;padding:13px 22px;touch-action:none}button:hover{filter:brightness(1.08)}button:focus-visible{outline:3px solid #fff;outline-offset:4px}#sound{background:#262e4a;color:#fff5df;font-size:13px;padding:12px}.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}.stat{background:#1e2744;border:1px solid #39415c;border-radius:16px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}.label{font-size:12px;color:#b9c5dd}.value{font-size:25px;font-weight:bold;font-variant-numeric:tabular-nums}.stage{position:relative;border-radius:24px;overflow:hidden;border:1px solid #465074;box-shadow:0 24px 70px #0005;background:#202d50}canvas{display:block;width:100%;height:auto;aspect-ratio:900/480;touch-action:none}.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#111a3488;backdrop-filter:blur(4px);text-align:center;padding:16px}.panel{max-width:440px;padding:25px}.panel .icon{font-size:48px}.panel h2{font-size:clamp(24px,4vw,36px);margin:10px 0}.panel p{color:#d2dbef;font-size:14px;line-height:1.9}.panel button{margin-top:8px;min-width:220px}.hidden{display:none}.bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;color:#bdc9e2;font-size:12px}.controls{display:flex;gap:9px}.controls button{background:#293451;color:#fff;font-size:23px;padding:7px 24px}.legend{margin-top:17px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap;color:#d2dbef;font-size:12px}#announce{position:absolute;left:-10000px}@media(max-width:600px){body{padding:12px}.stat{padding:10px;display:block}.label{display:block}.value{font-size:22px}canvas{aspect-ratio:600/580}.bottom{align-items:flex-start}.legend{gap:10px}header{gap:10px}#sound{font-size:11px}.panel{padding:8px}.panel p{font-size:12px}.panel .icon{font-size:34px}}
-
-.settings{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:12px;background:#1e2744;padding:12px 16px;border-radius:16px}.settings label{font-size:12px;color:#cbd5eb}select{font:inherit;background:#303d60;color:#fff5df;border:1px solid #5a6a91;border-radius:9px;padding:8px;margin-left:5px}.settings small{color:#b9c5dd}.clock{position:absolute;right:15px;top:15px;background:#10162ee8;border:1px solid #ffe0a3;border-radius:14px;padding:10px 18px;pointer-events:none;font-size:24px;font-weight:bold;font-variant-numeric:tabular-nums}.clock small{display:block;font-size:10px;color:#cbd5eb}.ranking{margin-top:18px;padding:18px;background:#1e2744;border-radius:18px}.ranking h2{margin:0 0 12px;font-size:18px}.rankgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.ranking ol{padding-left:25px;line-height:1.9;font-size:13px}.ranking button{padding:8px 13px;font-size:12px}.ranking p{color:#b9c5dd;font-size:11px}.rankgrid h3{font-size:13px;color:#ffd17d;margin:0}.clock.urgent{color:#ff9a96}@media(max-width:600px){.settings{gap:8px}.settings label{font-size:11px}select{padding:6px}.clock{top:9px;right:9px;font-size:19px;padding:7px 12px}.rankgrid{gap:8px}.ranking{padding:13px}}
-</style>
-<main>
-<header><div><div class="eyebrow">TWENTY SECONDS OF MAGIC</div><h1>ほしぞらキャッチ</h1></div><button id="sound" aria-pressed="true">♫ サウンド ON</button></header>
-<div class="settings"><label>♫ BGM <select id="bgm"><option value="0">きらきら散歩</option><option value="1">フルーツパレード</option><option value="2">月夜のワルツ</option></select></label><label>難しさ <select id="difficulty"><option value="EASY">EASY</option><option value="HARD">HARD</option></select></label><small id="difficultyHelp">EASY：ゆっくり・爆弾少なめ</small></div>
-<div class="stats"><div class="stat"><span class="label">スコア</span><span class="value" id="score">0</span></div><div class="stat"><span class="label">のこり</span><span class="value" id="time">20.0秒</span></div><div class="stat"><span class="label">ベスト</span><span class="value" id="best">0</span></div></div>
-<div class="stage"><canvas id="game" width="900" height="480" aria-label="上から降る果物と星を籠で集めるゲーム"></canvas><div class="clock" id="clock"><small>のこり時間</small><span id="stageTime">20.0秒</span></div><div class="overlay" id="overlay"><div class="panel"><div class="icon" id="icon">🧺 ✨</div><h2 id="title">夜空のごほうび、集めよう。</h2><p id="description">左右に動いて、降ってくる果物と星をキャッチ！<br>20秒で <strong>150点</strong> を集めたら GOOD！<br>爆弾には気をつけてね。</p><button id="start">スタート！</button><p id="hint">← → キー ／ 下のボタン ／ タッチで操作<br>音楽と効果音はスタートすると流れます</p></div></div></div>
-<div class="bottom"><span>← → で移動 · P で一時停止<br>タッチ画面では籠をドラッグしても遊べます</span><div class="controls"><button id="left" aria-label="左へ">←</button><button id="pause" aria-label="一時停止">Ⅱ</button><button id="right" aria-label="右へ">→</button></div></div>
-<div class="legend"><span>🍎 果物 +10</span><span>⭐ 星 +30</span><span>💣 爆弾 −20</span><span>連続キャッチでボーナス！</span></div><div id="announce" role="status" aria-live="polite"></div>
-<section class="ranking"><h2>🏆 過去のベスト3</h2><div class="rankgrid"><div><h3>EASY</h3><ol id="rankEasy"></ol></div><div><h3>HARD</h3><ol id="rankHard"></ol></div></div><button id="export">ランキングをJSONで保存</button><p id="saveStatus">このブラウザに自動保存されます。JSONファイルもダウンロードできます。</p></section>
-</main>
-<script>
-'use strict';
-const $=id=>document.getElementById(id),canvas=$('game'),ctx=canvas.getContext('2d');
-let best=0, rankings={EASY:[],HARD:[]},mode='EASY';
-const rules={EASY:{bomb:.10,star:.30,speed:120,accel:2.8,interval:.48,width:67},HARD:{bomb:.25,star:.39,speed:225,accel:5,interval:.28,width:52}};
-try{const data=JSON.parse(localStorage.getItem('starcatch-rankings-v2'));for(const m of ['EASY','HARD'])if(Array.isArray(data?.[m]))rankings[m]=data[m].filter(r=>Number.isFinite(r.score)&&r.score>=0&&typeof r.date==='string').sort((a,b)=>b.score-a.score).slice(0,3);const legacy=Number(localStorage.getItem('starcatch-best'));if(!rankings.EASY.length&&legacy>0)rankings.EASY.push({score:legacy,date:'以前の記録'});}catch{}
-function renderRanks(){for(const m of ['EASY','HARD']){const list=$(m==='EASY'?'rankEasy':'rankHard');list.replaceChildren();if(!rankings[m].length){const li=document.createElement('li');li.textContent='まだ記録がありません';list.appendChild(li)}for(const r of rankings[m]){const li=document.createElement('li');li.textContent=r.score+'点 · '+r.date;list.appendChild(li)}}best=rankings[$('difficulty').value]?.[0]?.score||0;$('best').textContent=best}
-renderRanks();
-$('export').onclick=()=>{const blob=new Blob([JSON.stringify({game:'ほしぞらキャッチ',version:2,rankings},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ほしぞらキャッチ-ランキング.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-$('difficulty').onchange=()=>{$('difficultyHelp').textContent=$('difficulty').value==='EASY'?'EASY：ゆっくり・爆弾少なめ':'HARD：速い・爆弾多め';renderRanks()};
-let state='ready',score=0,remaining=20,elapsed=0,spawn=0,items=[],particles=[],labels=[],combo=0,x=450,keys={left:false,right:false},last=0,muted=false,ac,musicTimer,noteIndex=0,lastTick=4,flash=0;
-const stars=Array.from({length:65},(_,i)=>({x:(i*137.5)%900,y:(i*73.1)%350,r:i%3===0?1.8:1}));
-function tone(freq,duration=.12,type='sine',volume=.12,delay=0){if(muted||!ac)return;const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(volume,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+duration);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+duration+.02)}
-function effect(kind){if(kind==='fruit'){tone(660);tone(880,.16,'sine',.1,.06)}if(kind==='star'){[784,988,1175,1568].forEach((n,i)=>tone(n,.22,'sine',.1,i*.055))}if(kind==='bomb'){tone(100,.3,'sawtooth',.1);tone(65,.35,'triangle',.2,.06)}if(kind==='start'){[523,659,784,1047].forEach((n,i)=>tone(n,.2,'triangle',.13,i*.1))}if(kind==='end'){[523,659,784,1047,1319].forEach((n,i)=>tone(n,.5,'triangle',.12,i*.12))}}
-const tracks=[
-{tempo:190,wave:'triangle',notes:[659,0,784,880,784,659,587,523,587,0,659,784,659,587,523,0,659,784,1047,988,880,784,659,587,523,587,659,784,587,0,523,0],bass:[131,175,220,196]},
-{tempo:140,wave:'square',notes:[523,659,784,659,880,784,659,587,523,523,659,784,1047,0,784,0,698,880,1047,880,784,659,587,659,784,0,659,587,523,0,523,0],bass:[131,165,175,196]},
-{tempo:270,wave:'sine',notes:[440,523,659,880,659,523,392,494,587,784,587,494,349,440,523,698,523,440,330,415,494,659,494,415],bass:[110,98,87,82]}];
-function music(){clearInterval(musicTimer);const track=tracks[Number($('bgm').value)];noteIndex=0;musicTimer=setInterval(()=>{if(state!=='playing')return;const n=noteIndex++,waltz=Number($('bgm').value)===2,beat=waltz?3:4,note=track.notes[n%track.notes.length];if(note)tone(note,.24,track.wave,track.wave==='square'?.023:.05);if(n%beat===0)tone(track.bass[Math.floor(n/(beat*2))%4],.4,'triangle',.07);if(n%beat!==0)tone(track.bass[Math.floor(n/(beat*2))%4]*2,.12,'sine',.035)},track.tempo)}
-$('bgm').onchange=()=>{audio();if(state==='playing'||state==='paused')music()};
-function audio(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume().catch(()=>{})}catch{}}
-$('sound').onclick=()=>{muted=!muted;$('sound').textContent='♫ サウンド '+(muted?'OFF':'ON');$('sound').setAttribute('aria-pressed',String(!muted));if(!muted)audio()};
-function update(){ $('score').textContent=score;$('time').textContent=remaining.toFixed(1)+'秒';$('time').style.color=remaining<=5?'#ff9a96':'';$('stageTime').textContent=remaining.toFixed(1)+'秒';$('clock').classList.toggle('urgent',remaining<=5)}
-function start(){mode=$('difficulty').value;$('difficulty').disabled=true;audio();state='playing';score=0;remaining=20;elapsed=0;spawn=.25;items=[];particles=[];labels=[];combo=0;x=450;lastTick=4;noteIndex=0;keys.left=keys.right=false;$('overlay').classList.add('hidden');$('pause').textContent='Ⅱ';update();effect('start');music()}
-$('start').onclick=()=>state==='paused'?togglePause():start();
-function togglePause(){if(state==='playing'){state='paused';keys.left=keys.right=false;$('title').textContent='ひとやすみ';$('description').innerHTML='準備ができたら、続きをどうぞ。';$('icon').textContent='🌙';$('start').textContent='つづける';$('hint').textContent='P キーでも再開できます';$('overlay').classList.remove('hidden');$('pause').textContent='▶'}else if(state==='paused'){audio();state='playing';$('overlay').classList.add('hidden');$('pause').textContent='Ⅱ'}}
-$('pause').onclick=togglePause;
-function finish(){if(state!=='playing')return;state='ended';$('difficulty').disabled=false;clearInterval(musicTimer);keys.left=keys.right=false;const record=score>best;if(record){best=score;try{localStorage.setItem('starcatch-best',String(best))}catch{}}rankings[mode].push({score,date:new Date().toLocaleString('ja-JP')});rankings[mode].sort((a,b)=>b.score-a.score);rankings[mode]=rankings[mode].slice(0,3);try{localStorage.setItem('starcatch-rankings-v2',JSON.stringify(rankings))}catch{$('saveStatus').textContent='ブラウザに保存できませんでした。JSONで保存してください。'}renderRanks();const good=score>=150;$('icon').textContent=good?'🎉 ⭐ 🎉':'🧺 ✨';$('title').textContent=good?'GOOD！ おみごと！':'ナイスチャレンジ！';$('description').innerHTML='<strong style="font-size:32px;color:#ffd17d">'+score+'点</strong><br>'+(record?'自己ベスト更新！ ': '')+(good?'夜空のごほうびをたっぷり集めたね。':'次は150点を目指してみよう！');$('start').textContent='もう一度あそぶ';$('hint').textContent='果物を連続で取ると、5個ごとに＋20点！';$('overlay').classList.remove('hidden');$('announce').textContent='ゲーム終了。'+score+'点。'+(good?'GOOD！':'');effect('end')}
-window.addEventListener('keydown',e=>{if(['SELECT','BUTTON','INPUT'].includes(e.target?.tagName))return;if(['ArrowLeft','ArrowRight',' ','p','P'].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')keys.left=true;if(e.key==='ArrowRight')keys.right=true;if((e.key==='p'||e.key==='P')&&!e.repeat)togglePause();if(e.key===' '&&!e.repeat&&(state==='ready'||state==='ended'))start()}});window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft')keys.left=false;if(e.key==='ArrowRight')keys.right=false});window.addEventListener('blur',()=>{keys.left=keys.right=false;if(state==='playing')togglePause()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')togglePause()});
-for(const dir of ['left','right']){const b=$(dir);b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys[dir]=true};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>keys[dir]=false}
-let dragging=false;function move(e){if(state==='playing')x=Math.max(55,Math.min(845,(e.clientX-canvas.getBoundingClientRect().left)/canvas.getBoundingClientRect().width*900))}canvas.onpointerdown=e=>{dragging=true;canvas.setPointerCapture(e.pointerId);move(e)};canvas.onpointermove=e=>{if(dragging)move(e)};canvas.onpointerup=canvas.onpointercancel=()=>dragging=false;
-function roundRect(a,b,w,h,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(a,b,w,h,r);ctx.fill()}
-function drawSupporters(t){const cheer=state==='ended'?'おつかれさま！':combo>=5?'すごい！ その調子！':remaining<=5?'ラストスパート！':'がんばれ〜！';for(let i=0;i<3;i++){const cx=[110,450,785][i],cy=328+Math.sin(t*.004+i*2)*6;ctx.save();ctx.translate(cx,cy);ctx.globalAlpha=.78;ctx.strokeStyle='#ffe4b3';ctx.lineWidth=4;const wave=Math.sin(t*.008+i)*10;ctx.beginPath();ctx.moveTo(-23,6);ctx.lineTo(-40,-10+wave);ctx.moveTo(23,6);ctx.lineTo(40,-10-wave);ctx.stroke();ctx.font='45px "Segoe UI Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(['🍎','🍊','🍐'][i],0,0);ctx.fillStyle='#30233c';for(const ex of [-7,7]){ctx.beginPath();ctx.arc(ex,0,2.3,0,7);ctx.fill()}ctx.beginPath();ctx.arc(0,5,6,0,Math.PI);ctx.strokeStyle='#30233c';ctx.lineWidth=2;ctx.stroke();ctx.globalAlpha=1;roundRect(-67,-68,134,27,12,'#fff0ca');ctx.fillStyle='#473954';ctx.font='bold 12px sans-serif';ctx.fillText(i===1?cheer:['いけるよ！','応援してるよ！'][i===0?0:1],0,-54);ctx.restore()}}
-function draw(t){const g=ctx.createLinearGradient(0,0,0,480);g.addColorStop(0,'#202b51');g.addColorStop(1,'#576383');ctx.fillStyle=g;ctx.fillRect(0,0,900,480);for(const s of stars){ctx.globalAlpha=.45+.4*Math.sin(t*.001+s.x);ctx.fillStyle='#ffe4a7';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill()}ctx.globalAlpha=1;ctx.fillStyle='#ffe8b0';ctx.beginPath();ctx.arc(777,73,29,0,7);ctx.fill();ctx.fillStyle='#283456';ctx.beginPath();ctx.arc(789,64,26,0,7);ctx.fill();ctx.fillStyle='#354662';ctx.beginPath();ctx.moveTo(0,405);ctx.quadraticCurveTo(200,310,430,410);ctx.quadraticCurveTo(650,330,900,390);ctx.lineTo(900,480);ctx.lineTo(0,480);ctx.fill();ctx.fillStyle='#273b50';ctx.beginPath();ctx.moveTo(0,440);ctx.quadraticCurveTo(240,380,520,445);ctx.quadraticCurveTo(700,395,900,438);ctx.lineTo(900,480);ctx.lineTo(0,480);ctx.fill();
-drawSupporters(t);
-ctx.font='34px "Segoe UI Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';for(const a of items){ctx.save();ctx.translate(a.x,a.y);ctx.rotate(Math.sin(t*.003+a.x)*.15);ctx.fillText(a.icon,0,0);ctx.restore()}
-ctx.save();ctx.translate(x,415);ctx.strokeStyle='#ffd599';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(0,0,34,26,0,Math.PI,Math.PI*2);ctx.stroke();ctx.fillStyle='#d99a60';ctx.beginPath();ctx.moveTo(-48,-3);ctx.lineTo(48,-3);ctx.lineTo(36,43);ctx.quadraticCurveTo(0,53,-36,43);ctx.closePath();ctx.fill();ctx.save();ctx.clip();ctx.strokeStyle='#b77748';ctx.lineWidth=3;for(let a=-60;a<70;a+=13){ctx.beginPath();ctx.moveTo(a,-3);ctx.lineTo(a+14,50);ctx.stroke()}for(let y=9;y<49;y+=11){ctx.beginPath();ctx.moveTo(-50,y);ctx.lineTo(50,y);ctx.stroke()}ctx.restore();roundRect(-51,-7,102,11,5,'#ffe0a3');ctx.restore();
-for(const p of particles){ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()}ctx.globalAlpha=1;for(const l of labels){ctx.globalAlpha=Math.min(1,l.life*2);ctx.font='bold 23px sans-serif';ctx.fillStyle=l.color;ctx.fillText(l.text,l.x,l.y)}ctx.globalAlpha=1;if(combo>=2&&state==='playing'){ctx.font='bold 16px sans-serif';ctx.fillStyle='#ffe0a3';ctx.fillText(combo+' COMBO',x,362)}if(flash>0){ctx.fillStyle='rgba(255,100,100,'+flash*.25+')';ctx.fillRect(0,0,900,480)}}
-function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(state==='playing'){const step=Math.min(dt,remaining);remaining=Math.max(0,remaining-step);elapsed+=step;x=Math.max(55,Math.min(845,x+((keys.right?1:0)-(keys.left?1:0))*620*step));spawn-=step;if(spawn<=0){const r=Math.random(),rule=rules[mode],kind=r<rule.bomb?'bomb':r<rule.star?'star':'fruit';items.push({x:45+Math.random()*810,y:-28,kind,icon:kind==='bomb'?'💣':kind==='star'?'⭐':['🍎','🍊','🍓','🍐'][Math.floor(Math.random()*4)],speed:rule.speed+Math.random()*65+elapsed*rule.accel});spawn=rule.interval+Math.random()*.12}for(let i=items.length-1;i>=0;i--){const a=items[i],old=a.y;a.y+=a.speed*step;if(old<415&&a.y>=400&&a.y<=445&&Math.abs(a.x-x)<rules[mode].width){let delta=a.kind==='bomb'?-20:a.kind==='star'?30:10;if(a.kind==='bomb'){combo=0;flash=1}else{combo++;if(combo%5===0)delta+=20}score=Math.max(0,score+delta);effect(a.kind);labels.push({x:a.x,y:385,text:(delta>0?'+':'')+delta+(combo>0&&combo%5===0?' BONUS!':''),life:1,color:delta<0?'#ffacac':'#ffe4a3'});for(let j=0;j<12;j++)particles.push({x:a.x,y:410,vx:(Math.random()-.5)*220,vy:-Math.random()*180,r:2+Math.random()*3,life:1,color:delta<0?'#ff9898':'#ffdc8e'});items.splice(i,1)}else if(a.y>515){if(a.kind!=='bomb')combo=0;items.splice(i,1)}}for(const p of particles){p.x+=p.vx*step;p.y+=p.vy*step;p.vy+=240*step;p.life-=step*1.7}particles=particles.filter(p=>p.life>0);for(const l of labels){l.y-=40*step;l.life-=step}labels=labels.filter(l=>l.life>0);flash=Math.max(0,flash-step*3);if(remaining<=3&&Math.ceil(remaining)<lastTick&&remaining>0){lastTick=Math.ceil(remaining);tone(988,.08,'square',.045)}update();if(remaining<=0)finish()}draw(t);requestAnimationFrame(frame)}requestAnimationFrame(frame);
-</script>
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,user-scalable=no"
+  />
+  <title>ほしぞらキャッチ ― 20秒チャレンジ</title>
+  <link rel="stylesheet" href="styles.css" />
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">TWENTY SECONDS OF MAGIC</div>
+        <h1>ほしぞらキャッチ</h1>
+      </div>
+      <button id="sound" aria-pressed="true">♫ サウンド ON</button>
+    </header>
+    <div class="settings">
+      <label
+        >♫ BGM
+        <select id="bgm">
+          <option value="0">きらきら散歩</option>
+          <option value="1">フルーツパレード</option>
+          <option value="2">月夜のワルツ</option>
+        </select></label
+      ><label
+        >難しさ
+        <select id="difficulty">
+          <option value="EASY">EASY</option>
+          <option value="HARD">HARD</option>
+        </select></label
+      ><small id="difficultyHelp">EASY：ゆっくり・爆弾少なめ</small>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="label">スコア</span><span class="value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="label">のこり</span
+        ><span class="value" id="time">20.0秒</span>
+      </div>
+      <div class="stat">
+        <span class="label">ベスト</span><span class="value" id="best">0</span>
+      </div>
+    </div>
+    <div class="stage">
+      <canvas
+        id="game"
+        width="900"
+        height="480"
+        aria-label="上から降る果物と星を籠で集めるゲーム"
+      ></canvas>
+      <div class="clock" id="clock">
+        <small>のこり時間</small><span id="stageTime">20.0秒</span>
+      </div>
+      <div class="overlay" id="overlay">
+        <div class="panel">
+          <div class="icon" id="icon">🧺 ✨</div>
+          <h2 id="title">夜空のごほうび、集めよう。</h2>
+          <p id="description">
+            左右に動いて、降ってくる果物と星をキャッチ！<br />20秒で
+            <strong>150点</strong> を集めたら GOOD！<br />爆弾には気をつけてね。
+          </p>
+          <button id="start">スタート！</button>
+          <p id="hint">
+            ← → キー ／ 下のボタン ／ タッチで操作<br />音楽と効果音はスタートすると流れます
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="bottom">
+      <span
+        >← → で移動 · P で一時停止<br />タッチ画面では籠をドラッグしても遊べます</span
+      >
+      <div class="controls">
+        <button id="left" aria-label="左へ">←</button
+        ><button id="pause" aria-label="一時停止">Ⅱ</button
+        ><button id="right" aria-label="右へ">→</button>
+      </div>
+    </div>
+    <div class="legend">
+      <span>🍎 果物 +10</span><span>⭐ 星 +30</span><span>💣 爆弾 −20</span
+      ><span>連続キャッチでボーナス！</span>
+    </div>
+    <div id="announce" role="status" aria-live="polite"></div>
+    <section class="ranking">
+      <h2>🏆 過去のベスト3</h2>
+      <div class="rankgrid">
+        <div>
+          <h3>EASY</h3>
+          <ol id="rankEasy"></ol>
+        </div>
+        <div>
+          <h3>HARD</h3>
+          <ol id="rankHard"></ol>
+        </div>
+      </div>
+      <button id="export">ランキングをJSONで保存</button>
+      <p id="saveStatus">
+        このブラウザに自動保存されます。JSONファイルもダウンロードできます。
+      </p>
+    </section>
+  </main>
+  <script type="module" src="js/game.js"></script>
 </html>
