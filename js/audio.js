@@ -31,6 +31,11 @@
         tone(660);
         tone(880, 0.16, "sine", 0.1, 0.06);
       }
+      if (kind === "superstar") {
+        [523, 784, 1047, 1568, 2093].forEach((n, i) =>
+          tone(n, 0.4, "triangle", 0.1, i * 0.08),
+        );
+      }
       if (kind === "star") {
         [784, 988, 1175, 1568].forEach((n, i) =>
           tone(n, 0.22, "sine", 0.1, i * 0.055),

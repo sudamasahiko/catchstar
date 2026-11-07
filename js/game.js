@@ -31,6 +31,8 @@
     labels = [],
     combo = 0,
     x = 450,
+    previousX = 450,
+    tilt = 0,
     keys = { left: false, right: false },
     last = 0,
     lastTick = 4,
@@ -43,6 +45,7 @@
     remaining,
     items,
     x,
+    tilt,
     particles,
     labels,
     flash,
@@ -67,7 +70,8 @@
     particles = [];
     labels = [];
     combo = 0;
-    x = 450;
+    x = previousX = 450;
+    tilt = 0;
     lastTick = 4;
     keys.left = keys.right = false;
     $("overlay").classList.add("hidden");
@@ -115,7 +119,7 @@
         ? "夜空のごほうびをたっぷり集めたね。"
         : "次は150点を目指してみよう！");
     $("start").textContent = "もう一度あそぶ";
-    $("hint").textContent = "果物を連続で取ると、5個ごとに＋20点！";
+    $("hint").textContent = "5コンボごとに＋20点、10コンボから得点2倍！";
     $("overlay").classList.remove("hidden");
     $("announce").textContent =
       "ゲーム終了。" + score + "点。" + (good ? "GOOD！" : "");
@@ -145,21 +149,37 @@
           x + ((keys.right ? 1 : 0) - (keys.left ? 1 : 0)) * 620 * step,
         ),
       );
+      const direction = Math.max(
+        -1,
+        Math.min(1, (x - previousX) / Math.max(620 * step, 1)),
+      );
+      const targetTilt = (direction * Math.PI) / 18;
+      tilt += (targetTilt - tilt) * (1 - Math.exp(-14 * step));
+      previousX = x;
       spawn -= step;
       if (spawn <= 0) {
         const r = Math.random(),
           rule = rules[mode],
-          kind = r < rule.bomb ? "bomb" : r < rule.star ? "star" : "fruit";
+          kind =
+            r >= 0.988
+              ? "superstar"
+              : r < rule.bomb
+                ? "bomb"
+                : r < rule.star
+                  ? "star"
+                  : "fruit";
         items.push({
           x: 45 + Math.random() * 810,
           y: -28,
           kind,
           icon:
-            kind === "bomb"
-              ? "💣"
-              : kind === "star"
-                ? "⭐"
-                : ["🍎", "🍊", "🍓", "🍐"][Math.floor(Math.random() * 4)],
+            kind === "superstar"
+              ? "🌟"
+              : kind === "bomb"
+                ? "💣"
+                : kind === "star"
+                  ? "⭐"
+                  : ["🍎", "🍊", "🍓", "🍐"][Math.floor(Math.random() * 4)],
           speed: rule.speed + Math.random() * 65 + elapsed * rule.accel,
         });
         spawn = rule.interval + Math.random() * 0.12;
@@ -174,25 +194,35 @@
           a.y <= 445 &&
           Math.abs(a.x - x) < rules[mode].width
         ) {
-          let delta = a.kind === "bomb" ? -20 : a.kind === "star" ? 30 : 10;
-          if (a.kind === "bomb") {
-            combo = 0;
-            flash = 1;
-          } else {
-            combo++;
-            if (combo % 5 === 0) delta += 20;
+          const result = window.StarCatch.resolveCatch(a.kind, combo);
+          const delta = result.points;
+          combo = result.combo;
+          if (a.kind === "bomb") flash = 1;
+          if (result.extraTime) {
+            remaining += result.extraTime;
+            lastTick = 4;
+            $("announce").textContent =
+              "スーパースター！ 残り時間が10秒増えました。";
+          } else if (combo === 10) {
+            $("announce").textContent = "フィーバー！ 得点が2倍になりました。";
           }
           score = Math.max(0, score + delta);
           effect(a.kind);
           labels.push({
-            x: a.x,
+            x: a.kind === "superstar" ? Math.max(150, Math.min(750, a.x)) : a.x,
             y: 385,
             text:
+              (a.kind === "superstar" ? "SUPER! +10秒 / " : "") +
               (delta > 0 ? "+" : "") +
               delta +
               (combo > 0 && combo % 5 === 0 ? " BONUS!" : ""),
             life: 1,
-            color: delta < 0 ? "#ffacac" : "#ffe4a3",
+            color:
+              a.kind === "superstar"
+                ? "#98fff2"
+                : delta < 0
+                  ? "#ffacac"
+                  : "#ffe4a3",
           });
           for (let j = 0; j < 12; j++)
             particles.push({

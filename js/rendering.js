@@ -13,21 +13,13 @@
       ctx.fill();
     }
     function drawSupporters(t) {
-      const { state, combo, remaining } = getScene();
-      const cheer =
-        state === "ended"
-          ? "おつかれさま！"
-          : combo >= 5
-            ? "すごい！ その調子！"
-            : remaining <= 5
-              ? "ラストスパート！"
-              : "がんばれ〜！";
       for (let i = 0; i < 3; i++) {
         const cx = [110, 450, 785][i],
           cy = 328 + Math.sin(t * 0.004 + i * 2) * 6;
         ctx.save();
         ctx.translate(cx, cy);
-        ctx.globalAlpha = 0.78;
+        ctx.globalAlpha = 0.24;
+        ctx.filter = "saturate(0.25)";
         ctx.strokeStyle = "#ffe4b3";
         ctx.lineWidth = 4;
         const wave = Math.sin(t * 0.008 + i) * 10;
@@ -52,20 +44,12 @@
         ctx.strokeStyle = "#30233c";
         ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.globalAlpha = 1;
-        roundRect(-67, -68, 134, 27, 12, "#fff0ca");
-        ctx.fillStyle = "#473954";
-        ctx.font = "bold 12px sans-serif";
-        ctx.fillText(
-          i === 1 ? cheer : ["いけるよ！", "応援してるよ！"][i === 0 ? 0 : 1],
-          0,
-          -54,
-        );
         ctx.restore();
       }
     }
     function draw(t) {
-      const { state, items, x, particles, labels, combo, flash } = getScene();
+      const { state, items, x, tilt, particles, labels, combo, flash } =
+        getScene();
       const g = ctx.createLinearGradient(0, 0, 0, 480);
       g.addColorStop(0, "#202b51");
       g.addColorStop(1, "#576383");
@@ -111,11 +95,23 @@
         ctx.save();
         ctx.translate(a.x, a.y);
         ctx.rotate(Math.sin(t * 0.003 + a.x) * 0.15);
+        if (a.kind === "superstar") {
+          ctx.shadowColor = "#98fff2";
+          ctx.shadowBlur = 18 + 6 * Math.sin(t * 0.008);
+          ctx.scale(1.3, 1.3);
+        }
         ctx.fillText(a.icon, 0, 0);
+        if (a.kind === "superstar") {
+          ctx.shadowBlur = 0;
+          ctx.font = "bold 11px sans-serif";
+          ctx.fillStyle = "#c4fff5";
+          ctx.fillText("+10秒", 0, -27);
+        }
         ctx.restore();
       }
       ctx.save();
       ctx.translate(x, 415);
+      ctx.rotate(tilt);
       ctx.strokeStyle = "#ffd599";
       ctx.lineWidth = 6;
       ctx.beginPath();
@@ -166,7 +162,21 @@
       if (combo >= 2 && state === "playing") {
         ctx.font = "bold 16px sans-serif";
         ctx.fillStyle = "#ffe0a3";
-        ctx.fillText(combo + " COMBO", x, 362);
+        ctx.fillText(
+          combo + (combo >= 10 ? " COMBO · FEVER ×2" : " COMBO"),
+          Math.max(110, Math.min(790, x)),
+          350,
+        );
+        const progress = Math.min(combo / 10, 1);
+        roundRect(x - 45, 366, 90, 5, 2, "#273b50");
+        roundRect(
+          x - 45,
+          366,
+          90 * progress,
+          5,
+          2,
+          combo >= 10 ? "#98fff2" : "#ffe0a3",
+        );
       }
       if (flash > 0) {
         ctx.fillStyle = "rgba(255,100,100," + flash * 0.25 + ")";

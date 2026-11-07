@@ -21,6 +21,7 @@ python3 -m http.server 8000 --bind 127.0.0.1
 | `js/controls.js`  | キーボード・ポインター・自動一時停止 |
 | `js/audio.js`     | BGM・効果音・ミュート                |
 | `js/rankings.js`  | ランキング表示・保存・JSON 出力      |
+| `js/scoring.js`   | 得点・コンボ・時間延長のルール       |
 | `js/dom.js`       | DOM 要素の取得                       |
 
 ランキングの保存キー・JSON 形式は以前のバージョンと同じです。
@@ -34,6 +35,7 @@ Node.js、Playwright、Chromium を用意し、上記サーバーを起動して
 ```sh
 node tests/smoke.cjs
 node tests/local-loading.cjs
+node tests/features.cjs
 ```
 
 `CHROMIUM_PATH` で Chromium の実行ファイル、`TEST_URL` で検証する HTTP URL を指定できます。
@@ -41,3 +43,9 @@ node tests/local-loading.cjs
 JSON 出力、モバイル幅での表示を確認します。音声の実際の聞こえ方は手動で確認してください。
 
 `local-loading.cjs` は不透明なオリジンで開始・一時停止・再開を検証し、モジュールの CORS 制約が出る条件での退行を防ぎます。
+
+## スーパースターとフィーバー
+
+🌟 は出現するアイテムの約1.2%のスーパースターです。キャッチすると＋30点と残り時間＋10秒。通常の ⭐ は＋30点のままです。
+5コンボごとに＋20点、10コンボからは果物・星の基本得点が2倍になります（5コンボのボーナスは＋20点のまま）。
+爆弾に当たるか、果物・星を取り逃すとコンボとフィーバーがリセットされます。

@@ -9,6 +9,10 @@ const { chromium } = require("playwright");
   });
   try {
     const page = await browser.newPage();
+    // Keep the timed smoke test deterministic; rare time extensions have their own test.
+    await page.addInitScript(() => {
+      Math.random = () => 0.5;
+    });
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
     page.on("response", (r) => {
