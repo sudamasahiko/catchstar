@@ -52,8 +52,6 @@
   }));
   function update() {
     $("score").textContent = score;
-    $("time").textContent = remaining.toFixed(1) + "秒";
-    $("time").style.color = remaining <= 5 ? "#ff9a96" : "";
     $("stageTime").textContent = remaining.toFixed(1) + "秒";
     $("clock").classList.toggle("urgent", remaining <= 5);
   }
@@ -158,31 +156,9 @@
       previousX = x;
       spawn -= step;
       if (spawn <= 0) {
-        const r = Math.random(),
-          rule = rules[mode],
-          kind =
-            r >= 0.988
-              ? "superstar"
-              : r < rule.bomb
-                ? "bomb"
-                : r < rule.star
-                  ? "star"
-                  : "fruit";
-        items.push({
-          x: 45 + Math.random() * 810,
-          y: -28,
-          kind,
-          icon:
-            kind === "superstar"
-              ? "🌟"
-              : kind === "bomb"
-                ? "💣"
-                : kind === "star"
-                  ? "⭐"
-                  : ["🍎", "🍊", "🍓", "🍐"][Math.floor(Math.random() * 4)],
-          speed: rule.speed + Math.random() * 65 + elapsed * rule.accel,
-        });
-        spawn = rule.interval + Math.random() * 0.12;
+        const drop = window.StarCatch.createDrop(rules[mode], elapsed);
+        items.push(...drop.items);
+        spawn = drop.interval;
       }
       for (let i = items.length - 1; i >= 0; i--) {
         const a = items[i],
@@ -196,6 +172,7 @@
         ) {
           const result = window.StarCatch.resolveCatch(a.kind, combo);
           const delta = result.points;
+          const completedTriple = a.triple && ++a.triple.caught === 3;
           combo = result.combo;
           if (a.kind === "bomb") flash = 1;
           if (result.extraTime) {
@@ -206,16 +183,22 @@
           } else if (combo === 10) {
             $("announce").textContent = "フィーバー！ 得点が2倍になりました。";
           }
+          if (completedTriple)
+            $("announce").textContent = "三連星を全部キャッチ！基本90点獲得。";
           score = Math.max(0, score + delta);
           effect(a.kind);
           labels.push({
-            x: a.kind === "superstar" ? Math.max(150, Math.min(750, a.x)) : a.x,
+            x:
+              a.kind === "superstar" || completedTriple
+                ? Math.max(150, Math.min(750, a.x))
+                : a.x,
             y: 385,
-            text:
-              (a.kind === "superstar" ? "SUPER! +10秒 / " : "") +
-              (delta > 0 ? "+" : "") +
-              delta +
-              (combo > 0 && combo % 5 === 0 ? " BONUS!" : ""),
+            text: completedTriple
+              ? "三連星！基本 +90点"
+              : (a.kind === "superstar" ? "SUPER! +10秒 / " : "") +
+                (delta > 0 ? "+" : "") +
+                delta +
+                (combo > 0 && combo % 5 === 0 ? " BONUS!" : ""),
             life: 1,
             color:
               a.kind === "superstar"

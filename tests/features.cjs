@@ -108,9 +108,9 @@ const { chromium } = require("playwright");
         "miss resets combo",
       );
       await page.click("#pause");
-      const t = await page.locator("#time").textContent();
+      const t = await page.locator("#stageTime").textContent();
       await page.clock.runFor(1000);
-      assert.equal(await page.locator("#time").textContent(), t);
+      assert.equal(await page.locator("#stageTime").textContent(), t);
       await page.click("#start");
     }
     await page.setViewportSize({ width: 1000, height: 900 });

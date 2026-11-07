@@ -39,7 +39,7 @@ const { chromium } = require("playwright");
     await page.click("#start");
     await page.waitForTimeout(1200);
     assert.equal(await page.locator("#overlay").isVisible(), false);
-    assert.notEqual(await page.locator("#time").textContent(), "20.0秒");
+    assert.notEqual(await page.locator("#stageTime").textContent(), "20.0秒");
     await page.click("#pause");
     assert.equal(await page.locator("#title").textContent(), "ひとやすみ");
     await page.click("#start");

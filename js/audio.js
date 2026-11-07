@@ -127,8 +127,8 @@
     }
     $("sound").onclick = () => {
       muted = !muted;
-      $("sound").textContent = "♫ サウンド " + (muted ? "OFF" : "ON");
-      $("sound").setAttribute("aria-pressed", String(!muted));
+      $("soundState").textContent = muted ? "OFF" : "ON";
+      $("sound").setAttribute("aria-checked", String(!muted));
       if (!muted) audio();
     };
 

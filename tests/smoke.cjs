@@ -23,7 +23,7 @@ const { chromium } = require("playwright");
     assert.match(await page.title(), /ほしぞらキャッチ/);
     await page.click("#sound");
     assert.equal(
-      await page.locator("#sound").getAttribute("aria-pressed"),
+      await page.locator("#sound").getAttribute("aria-checked"),
       "false",
     );
     await page.click("#sound");
@@ -32,12 +32,12 @@ const { chromium } = require("playwright");
       await page.selectOption("#difficulty", mode);
       await page.click("#start");
       await page.waitForTimeout(1200);
-      assert.notEqual(await page.locator("#time").textContent(), "20.0秒");
+      assert.notEqual(await page.locator("#stageTime").textContent(), "20.0秒");
       assert.equal(await page.locator("#difficulty").isDisabled(), true);
       await page.click("#pause");
-      const time = await page.locator("#time").textContent();
+      const time = await page.locator("#stageTime").textContent();
       await page.waitForTimeout(300);
-      assert.equal(await page.locator("#time").textContent(), time);
+      assert.equal(await page.locator("#stageTime").textContent(), time);
       await page.click("#start");
       await page.locator("h1").click(); // keyboard input should target the document
       await page.keyboard.press("p");
@@ -48,7 +48,7 @@ const { chromium } = require("playwright");
         null,
         { timeout: 30000 },
       );
-      assert.equal(await page.locator("#time").textContent(), "0.0秒");
+      assert.equal(await page.locator("#stageTime").textContent(), "0.0秒");
       assert.equal(await page.locator("#difficulty").isDisabled(), false);
       const saved = await page.evaluate(() =>
         JSON.parse(localStorage.getItem("starcatch-rankings-v2")),

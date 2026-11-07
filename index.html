@@ -9,10 +9,20 @@
   <main>
     <header>
       <div>
-        <div class="eyebrow">TWENTY SECONDS OF MAGIC</div>
         <h1>ほしぞらキャッチ</h1>
       </div>
-      <button id="sound" aria-pressed="true">♫ サウンド ON</button>
+      <button
+        id="sound"
+        type="button"
+        role="switch"
+        aria-checked="true"
+        aria-label="サウンド"
+      >
+        <span>♫ サウンド</span
+        ><span class="switch-track" aria-hidden="true"
+          ><span class="switch-thumb"></span></span
+        ><span id="soundState" aria-hidden="true">ON</span>
+      </button>
     </header>
     <div class="settings">
       <label
@@ -30,18 +40,6 @@
         </select></label
       ><small id="difficultyHelp">EASY：ゆっくり・爆弾少なめ</small>
     </div>
-    <div class="stats">
-      <div class="stat">
-        <span class="label">スコア</span><span class="value" id="score">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">のこり</span
-        ><span class="value" id="time">20.0秒</span>
-      </div>
-      <div class="stat">
-        <span class="label">ベスト</span><span class="value" id="best">0</span>
-      </div>
-    </div>
     <div class="stage">
       <canvas
         id="game"
@@ -49,6 +47,9 @@
         height="480"
         aria-label="上から降る果物と星を籠で集めるゲーム"
       ></canvas>
+      <div class="score-hud">
+        <small>スコア</small><span id="score">0</span>
+      </div>
       <div class="clock" id="clock">
         <small>のこり時間</small><span id="stageTime">20.0秒</span>
       </div>
@@ -68,6 +69,9 @@
         </div>
       </div>
     </div>
+    <div class="best-score">
+      🏆 ベスト <strong id="best">0</strong><span>点（選択中の難しさ）</span>
+    </div>
     <div class="bottom">
       <span
         >← → で移動 · P で一時停止<br />タッチ画面では籠をドラッグしても遊べます</span
@@ -79,7 +83,8 @@
       </div>
     </div>
     <div class="legend">
-      <span>🍎 果物 +10</span><span>⭐ 星 +30</span><span>💣 爆弾 −20</span
+      <span>🍎 果物 +10</span><span>⭐ 星 +30</span
+      ><span>⭐ 三連星 基本＋90点</span><span>💣 爆弾 −20</span
       ><span>🌟 スーパースター ＋30点・時間＋10秒</span>
       <span>5コンボごとに＋20点 · 10コンボから得点2倍！</span>
     </div>
@@ -108,5 +113,6 @@
   <script defer src="js/rendering.js"></script>
   <script defer src="js/controls.js"></script>
   <script defer src="js/scoring.js"></script>
+  <script defer src="js/spawning.js"></script>
   <script defer src="js/game.js"></script>
 </html>
