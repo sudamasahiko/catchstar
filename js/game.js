@@ -33,7 +33,7 @@
     x = 450,
     previousX = 450,
     tilt = 0,
-    keys = { left: false, right: false },
+    keys = { left: false, right: false, turbo: false },
     last = 0,
     lastTick = 4,
     flash = 0;
@@ -71,7 +71,7 @@
     x = previousX = 450;
     tilt = 0;
     lastTick = 4;
-    keys.left = keys.right = false;
+    keys.left = keys.right = keys.turbo = false;
     $("overlay").classList.add("hidden");
     $("pause").textContent = "Ⅱ";
     update();
@@ -82,7 +82,7 @@
   function togglePause() {
     if (state === "playing") {
       state = "paused";
-      keys.left = keys.right = false;
+      keys.left = keys.right = keys.turbo = false;
       $("title").textContent = "ひとやすみ";
       $("description").innerHTML = "準備ができたら、続きをどうぞ。";
       $("icon").textContent = "🌙";
@@ -103,7 +103,7 @@
     state = "ended";
     $("difficulty").disabled = false;
     stopMusic();
-    keys.left = keys.right = false;
+    keys.left = keys.right = keys.turbo = false;
     const record = recordScore(mode, score);
     const good = score >= 150;
     $("icon").textContent = good ? "🎉 ⭐ 🎉" : "🧺 ✨";
@@ -117,7 +117,7 @@
         ? "夜空のごほうびをたっぷり集めたね。"
         : "次は150点を目指してみよう！");
     $("start").textContent = "もう一度あそぶ";
-    $("hint").textContent = "5コンボごとに＋20点、10コンボから得点2倍！";
+    $("hint").textContent = "5コンボごとに＋20点、3コンボから得点2倍！";
     $("overlay").classList.remove("hidden");
     $("announce").textContent =
       "ゲーム終了。" + score + "点。" + (good ? "GOOD！" : "");
@@ -140,16 +140,18 @@
       const step = Math.min(dt, remaining);
       remaining = Math.max(0, remaining - step);
       elapsed += step;
+      window.StarCatch.restoreMiniStars(items, elapsed);
+      const basketSpeed = keys.turbo ? 850 : 540;
       x = Math.max(
         55,
         Math.min(
           845,
-          x + ((keys.right ? 1 : 0) - (keys.left ? 1 : 0)) * 620 * step,
+          x + ((keys.right ? 1 : 0) - (keys.left ? 1 : 0)) * basketSpeed * step,
         ),
       );
       const direction = Math.max(
         -1,
-        Math.min(1, (x - previousX) / Math.max(620 * step, 1)),
+        Math.min(1, (x - previousX) / Math.max(basketSpeed * step, 1)),
       );
       const targetTilt = (direction * Math.PI) / 18;
       tilt += (targetTilt - tilt) * (1 - Math.exp(-14 * step));
@@ -170,6 +172,10 @@
           a.y <= 445 &&
           Math.abs(a.x - x) < rules[mode].width
         ) {
+          if (a.kind === "ministar") {
+            window.StarCatch.activateMiniStar(items, a, elapsed);
+            $("announce").textContent = "ミニスター！周囲のフルーツと爆弾が3秒間、星に変わります。";
+          }
           const result = window.StarCatch.resolveCatch(a.kind, combo);
           const delta = result.points;
           const completedTriple = a.triple && ++a.triple.caught === 3;
@@ -180,7 +186,7 @@
             lastTick = 4;
             $("announce").textContent =
               "スーパースター！ 残り時間が10秒増えました。";
-          } else if (combo === 10) {
+          } else if (combo === 3) {
             $("announce").textContent = "フィーバー！ 得点が2倍になりました。";
           }
           if (completedTriple)
@@ -195,7 +201,7 @@
             y: 385,
             text: completedTriple
               ? "三連星！基本 +90点"
-              : (a.kind === "superstar" ? "SUPER! +10秒 / " : "") +
+              : (a.kind === "superstar" ? "SUPER! +10秒 / " : a.kind === "ministar" ? "MINI! 3秒変身 / " : "") +
                 (delta > 0 ? "+" : "") +
                 delta +
                 (combo > 0 && combo % 5 === 0 ? " BONUS!" : ""),

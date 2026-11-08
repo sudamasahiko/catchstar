@@ -94,12 +94,12 @@ const { chromium } = require("playwright");
       assert.equal(await page.locator("#score").textContent(), "60");
       for (let i = 0; i < 8; i++) await inject("fruit");
       assert.equal(await page.evaluate(() => readScene().combo), 10);
-      assert.equal(await page.locator("#score").textContent(), "190"); // 60 + 7*10 + 20 + 2*20 bonuses
+      assert.equal(await page.locator("#score").textContent(), "260"); // 60 + 8*20 + two +20 bonuses
       await inject("star");
-      assert.equal(await page.locator("#score").textContent(), "250");
+      assert.equal(await page.locator("#score").textContent(), "320");
       await inject("bomb");
       assert.equal(await page.evaluate(() => readScene().combo), 0);
-      assert.equal(await page.locator("#score").textContent(), "230");
+      assert.equal(await page.locator("#score").textContent(), "300");
       await inject("fruit");
       await inject("fruit", 520);
       assert.equal(

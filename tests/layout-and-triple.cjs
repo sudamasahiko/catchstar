@@ -84,8 +84,8 @@ const { chromium } = require("playwright");
     await p.clock.runFor(2600);
     assert.equal(
       await p.locator("#score").textContent(),
-      "90",
-      "three collected stars give 90 base points",
+      "120",
+      "third collected star activates double points",
     );
     assert.equal(await p.evaluate(() => readScene().combo), 3);
     assert.match(await p.locator("#announce").textContent(), /三連星.*90点/);

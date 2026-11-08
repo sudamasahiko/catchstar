@@ -1,13 +1,15 @@
 (() => {
-  // One roll controls the event, so superstar rarity remains 1.2%.
+  // One roll controls the event, so superstar rarity is 1.8% and ministar rarity is 4%.
   function createDrop(rule, elapsed, random = Math.random) {
     const roll = random();
     const kind =
-      roll >= 0.988
+      roll >= 0.982
         ? "superstar"
-        : roll >= 0.938
+        : roll >= 0.932
           ? "triple"
-          : roll < rule.bomb
+          : roll >= 0.892
+            ? "ministar"
+            : roll < rule.bomb
             ? "bomb"
             : roll < rule.star
               ? "star"
@@ -20,7 +22,9 @@
     const icon =
       itemKind === "superstar"
         ? "🌟"
-        : itemKind === "bomb"
+        : itemKind === "ministar"
+          ? "⭐"
+          : itemKind === "bomb"
           ? "💣"
           : itemKind === "star"
             ? "⭐"

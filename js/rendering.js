@@ -100,6 +100,14 @@
           ctx.shadowBlur = 18 + 6 * Math.sin(t * 0.008);
           ctx.scale(1.3, 1.3);
         }
+        if (a.kind === "ministar") {
+          ctx.scale(0.7, 0.7);
+          ctx.shadowColor = "#c6adff";
+          ctx.shadowBlur = 20;
+        } else if (a.originalKind) {
+          ctx.shadowColor = "#c6adff";
+          ctx.shadowBlur = 15;
+        }
         ctx.fillText(a.icon, 0, 0);
         if (a.kind === "superstar") {
           ctx.shadowBlur = 0;
@@ -163,11 +171,11 @@
         ctx.font = "bold 16px sans-serif";
         ctx.fillStyle = "#ffe0a3";
         ctx.fillText(
-          combo + (combo >= 10 ? " COMBO · FEVER ×2" : " COMBO"),
+          combo + (combo >= 3 ? " COMBO · FEVER ×2" : " COMBO"),
           Math.max(110, Math.min(790, x)),
           350,
         );
-        const progress = Math.min(combo / 10, 1);
+        const progress = Math.min(combo / 3, 1);
         roundRect(x - 45, 366, 90, 5, 2, "#273b50");
         roundRect(
           x - 45,
@@ -175,7 +183,7 @@
           90 * progress,
           5,
           2,
-          combo >= 10 ? "#98fff2" : "#ffe0a3",
+          combo >= 3 ? "#98fff2" : "#ffe0a3",
         );
       }
       if (flash > 0) {

@@ -10,9 +10,10 @@
   }) {
     window.addEventListener("keydown", (e) => {
       if (["SELECT", "BUTTON", "INPUT"].includes(e.target?.tagName)) return;
-      if (["ArrowLeft", "ArrowRight", " ", "p", "P"].includes(e.key)) {
+      if (["ArrowLeft", "ArrowRight", " ", "p", "P", "b", "B"].includes(e.key)) {
         e.preventDefault();
         if (e.key === "ArrowLeft") keys.left = true;
+        if (e.key.toLowerCase() === "b") keys.turbo = true;
         if (e.key === "ArrowRight") keys.right = true;
         if ((e.key === "p" || e.key === "P") && !e.repeat) togglePause();
         if (
@@ -25,10 +26,11 @@
     });
     window.addEventListener("keyup", (e) => {
       if (e.key === "ArrowLeft") keys.left = false;
+      if (e.key.toLowerCase() === "b") keys.turbo = false;
       if (e.key === "ArrowRight") keys.right = false;
     });
     window.addEventListener("blur", () => {
-      keys.left = keys.right = false;
+      keys.left = keys.right = keys.turbo = false;
       if (getState() === "playing") togglePause();
     });
     document.addEventListener("visibilitychange", () => {
